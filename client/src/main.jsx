@@ -8,8 +8,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 
 // Set the base URL for all axios requests
-axios.defaults.baseURL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+// In production (Docker), we want relative paths so it uses the same origin
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.PROD ? "" : "http://localhost:3000");
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

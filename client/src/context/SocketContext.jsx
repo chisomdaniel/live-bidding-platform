@@ -37,9 +37,14 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const backendUrl =
-        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-      console.log(`Connecting to socket at: ${backendUrl}`);
+      // In production (Docker), undefined URL means relative to window.location (which works perfect for single-domain deployment)
+      // In development, we default to localhost:3000
+      let backendUrl = import.meta.env.VITE_BACKEND_URL;
+      if (!backendUrl) {
+          backendUrl = import.meta.env.PROD ? undefined : "http://localhost:3000";
+      }
+
+      console.log(`Connecting to socket at: ${backendUrl || 'current origin'}`);
 
       const newSocket = io(backendUrl, {
         auth: { token },
