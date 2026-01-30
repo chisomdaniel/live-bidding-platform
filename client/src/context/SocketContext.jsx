@@ -37,13 +37,14 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      console.log("Initializing socket connection to http://localhost:3000");
-      // Connecting directly to backend to avoid proxy issues with WebSockets
-      const newSocket = io("http://localhost:3000", {
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      console.log(`Connecting to socket at: ${backendUrl}`);
+
+      const newSocket = io(backendUrl, {
         auth: { token },
         withCredentials: true,
         reconnection: true,
-        reconnectionAttempts: 5,
       });
 
       newSocket.on("connect", () => {
