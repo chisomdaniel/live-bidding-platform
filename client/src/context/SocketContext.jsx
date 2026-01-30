@@ -37,13 +37,23 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const newSocket = io("/", {
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      console.log(`Connecting to socket at: ${backendUrl}`);
+
+      const newSocket = io(backendUrl, {
         auth: { token },
-        path: "/socket.io",
+        withCredentials: true,
+        reconnection: true,
       });
 
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
+      });
+
+      newSocket.on("BID_ERROR", (err) => {
+        console.error("Bid error:", err);
+        alert(`Bid failed: ${err.message}`);
       });
 
       newSocket.on("error", (err) => {

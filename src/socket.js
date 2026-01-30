@@ -9,7 +9,9 @@ let io;
 export const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+      methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
@@ -33,6 +35,9 @@ export const initSocket = (httpServer) => {
     logger.info(`Client connected: ${socket.id}, User ID: ${socket.user.sub}`);
 
     socket.on("BID_PLACED", async (data) => {
+      logger.info(
+        `Received BID_PLACED: ${JSON.stringify(data)} from ${socket.user ? socket.user.sub : "unknown"}`,
+      );
       try {
         const { itemId, amount } = data;
 
@@ -42,6 +47,10 @@ export const initSocket = (httpServer) => {
           itemId,
           amount,
           socket.user.sub,
+        );
+
+        logger.info(
+          `Bid success for item ${itemId}. New price: ${updatedItem.currentBid}`,
         );
 
         // Broadcast new bid to everyone in the item room (or globally if preferred)
@@ -59,7 +68,7 @@ export const initSocket = (httpServer) => {
         });
       } catch (error) {
         logger.error(`Bid error: ${error.message}`);
-        socket.emit("error", { message: error.message });
+        socket.emit("BID_ERROR", { message: error.message });
       }
     });
 
