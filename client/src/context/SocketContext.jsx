@@ -37,9 +37,14 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const newSocket = io("/", {
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      console.log(`Connecting to socket at: ${backendUrl}`);
+
+      const newSocket = io(backendUrl, {
         auth: { token },
-        path: "/socket.io",
+        withCredentials: true,
+        reconnection: true,
       });
 
       newSocket.on("connect", () => {
