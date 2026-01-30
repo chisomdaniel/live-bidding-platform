@@ -3,8 +3,6 @@ import helmet from "helmet";
 import cors from "cors";
 import httpStatus from "http-status";
 import passport from "passport";
-import path from "path";
-import { fileURLToPath } from "url";
 import config from "./config/config.js";
 import * as morgan from "./config/morgan.js";
 import passportConfig from "./config/passport.js";
@@ -38,24 +36,6 @@ passport.use("jwt", passportConfig.jwtStrategy);
 
 // v1 api routes
 app.use("/v1", routes);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve static files from the public folder (React build)
-app.use(express.static(path.join(__dirname, "../public")));
-
-// Handle SPA fallback
-app.get(/.*/, (req, res, next) => {
-  if (req.originalUrl.startsWith("/v1")) {
-    return next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
-  }
-  res.sendFile(path.join(__dirname, "../public/index.html"), (err) => {
-    if (err) {
-      next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
-    }
-  });
-});
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

@@ -37,13 +37,22 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const newSocket = io("/", {
+      console.log("Initializing socket connection to http://localhost:3000");
+      // Connecting directly to backend to avoid proxy issues with WebSockets
+      const newSocket = io("http://localhost:3000", {
         auth: { token },
-        path: "/socket.io",
+        withCredentials: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
       });
 
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
+      });
+
+      newSocket.on("BID_ERROR", (err) => {
+        console.error("Bid error:", err);
+        alert(`Bid failed: ${err.message}`);
       });
 
       newSocket.on("error", (err) => {
