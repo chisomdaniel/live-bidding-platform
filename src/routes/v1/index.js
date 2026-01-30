@@ -1,12 +1,27 @@
-import express from 'express';
-import healthRoute from './health.route.js';
+import express from "express";
+import healthRoute from "./health.route.js";
+import userRoute from "./user.route.js";
+import authRoute from "./auth.route.js";
+import itemRoute from "./item.route.js";
 
 const router = express.Router();
 
 const defaultRoutes = [
   {
-    path: '/health',
+    path: "/auth",
+    route: authRoute,
+  },
+  {
+    path: "/health",
     route: healthRoute,
+  },
+  {
+    path: "/users",
+    route: userRoute,
+  },
+  {
+    path: "/items",
+    route: itemRoute,
   },
 ];
 

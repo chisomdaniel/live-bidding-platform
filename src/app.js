@@ -1,16 +1,18 @@
-import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import httpStatus from 'http-status';
-import config from './config/config.js';
-import * as morgan from './config/morgan.js';
-import routes from './routes/v1/index.js';
-import { errorConverter, errorHandler } from './middlewares/error.js';
-import ApiError from './utils/ApiError.js';
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import httpStatus from "http-status";
+import passport from "passport";
+import config from "./config/config.js";
+import * as morgan from "./config/morgan.js";
+import passportConfig from "./config/passport.js";
+import routes from "./routes/v1/index.js";
+import { errorConverter, errorHandler } from "./middlewares/error.js";
+import ApiError from "./utils/ApiError.js";
 
 const app = express();
 
-if (config.env !== 'test') {
+if (config.env !== "test") {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
@@ -28,12 +30,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 // app.options('*', cors());
 
+// jwt authentication
+app.use(passport.initialize());
+passport.use("jwt", passportConfig.jwtStrategy);
+
 // v1 api routes
-app.use('/v1', routes);
+app.use("/v1", routes);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
 
 // convert error to ApiError, if needed
