@@ -77,7 +77,13 @@ const ItemCard = ({ item }) => {
       alert("Please login to bid");
       return;
     }
-    const nextBid = item.currentBid + 10;
+    if (isWinning) {
+      alert("You are currently the highest bidder!");
+      return;
+    }
+    const currentPrice =
+      item.currentBid > 0 ? item.currentBid : item.startingPrice;
+    const nextBid = currentPrice + 10;
     socket.emit("BID_PLACED", { itemId: item.id || item._id, amount: nextBid });
   };
 
@@ -111,7 +117,9 @@ const ItemCard = ({ item }) => {
               flash ? "scale-110" : "scale-100",
             )}
           >
-            {formatCurrency(item.currentBid)}
+            {formatCurrency(
+              item.currentBid > 0 ? item.currentBid : item.startingPrice,
+            )}
           </p>
         </div>
         <div className="text-right">
@@ -137,12 +145,14 @@ const ItemCard = ({ item }) => {
 
         <button
           onClick={placeBid}
-          disabled={isEnded || (user && isWinning)}
+          disabled={isEnded}
           className={clsx(
             "px-4 py-2 rounded font-bold text-white transition-colors",
             isEnded
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800",
+              : isWinning
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800",
           )}
         >
           Bid +$10
