@@ -22,7 +22,9 @@ COPY src/ ./src/
 COPY --from=frontend-builder /app/client/dist ./public
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5000
+
+ENV PORT=5000
 
 # Start the application
 CMD ["npm", "start"]
