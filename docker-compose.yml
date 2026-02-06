@@ -8,7 +8,7 @@ services:
       - PORT=${PORT:-5000}
       - MONGODB_URL=${MONGODB_URL:-mongodb://mongo:27017/live-bidding-platform}
       - JWT_SECRET=${JWT_SECRET}
-      - JWT_ACCESS_EXPIRATION_MINUTES=${JWT_ACCESS_EXPIRATION_MINUTES:-30}
+      - JWT_ACCESS_EXPIRATION_MINUTES=${JWT_ACCESS_EXPIRATION_MINUTES:-10080}
     depends_on:
       - mongo
 

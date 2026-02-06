@@ -6,7 +6,7 @@ import axios from "axios";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [socket, setSocket] = useState(null);
   const [timeOffset, setTimeOffset] = useState(0);
 
@@ -41,10 +41,10 @@ export const SocketProvider = ({ children }) => {
       // In development, we default to localhost:3000
       let backendUrl = import.meta.env.VITE_BACKEND_URL;
       if (!backendUrl) {
-          backendUrl = import.meta.env.PROD ? undefined : "http://localhost:3000";
+        backendUrl = import.meta.env.PROD ? undefined : "http://localhost:3000";
       }
 
-      console.log(`Connecting to socket at: ${backendUrl || 'current origin'}`);
+      console.log(`Connecting to socket at: ${backendUrl || "current origin"}`);
 
       const newSocket = io(backendUrl, {
         auth: { token },
@@ -54,6 +54,13 @@ export const SocketProvider = ({ children }) => {
 
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
+      });
+
+      newSocket.on("connect_error", (err) => {
+        console.error("Socket connect_error:", err.message);
+        if (err.message === "Authentication error") {
+          logout();
+        }
       });
 
       newSocket.on("error", (err) => {
